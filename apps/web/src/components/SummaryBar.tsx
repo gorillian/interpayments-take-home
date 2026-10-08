@@ -1,19 +1,15 @@
 import { Statistic } from "antd"
 
-import type { Transaction } from "../models/transaction"
-import { computeTotal } from "../utils/format"
-
 interface SummaryBarProps {
-  transactions: Transaction[]
+  count: number
+  totalProcessed: number
 }
 
-export const SummaryBar = ({ transactions }: SummaryBarProps) => {
-  const total = computeTotal(transactions)
-
+export const SummaryBar = ({ count, totalProcessed }: SummaryBarProps) => {
   return (
     <div className="summary-bar">
-      <Statistic title="Transactions" value={transactions.length} />
-      <Statistic title="Total processed" value={total} precision={2} prefix="$" />
+      <Statistic title="Transactions" value={count} />
+      <Statistic title="Total processed" value={totalProcessed} precision={2} prefix="$" />
     </div>
   )
 }

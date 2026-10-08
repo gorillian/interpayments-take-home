@@ -1,5 +1,5 @@
-import { useState } from "react"
-import { Input, Spin } from "antd"
+import { useEffect, useRef, useState } from "react"
+import { Input, Pagination, Spin } from "antd"
 import { SearchOutlined } from "@ant-design/icons"
 
 import { SummaryBar } from "../components/SummaryBar"
@@ -7,23 +7,27 @@ import { TransactionList } from "../components/TransactionList"
 import { TransactionModal } from "../components/TransactionModal"
 import { useTransactions } from "../hooks/useTransactions"
 import type { Transaction } from "../models/transaction"
+import { PAGE_SIZE } from "../services/transaction-service"
 
 export const TransactionsPage = () => {
-  const { transactions, loading } = useTransactions()
   const [search, setSearch] = useState("")
+  const [debouncedSearch, setDebouncedSearch] = useState("")
+  const [page, setPage] = useState(1)
   const [selected, setSelected] = useState<Transaction | null>(null)
+  const debouncedRef = useRef(debouncedSearch)
 
-  console.log("render TransactionsPage", transactions.length, "search:", search)
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      const next = search.trim()
+      if (debouncedRef.current === next) return
+      debouncedRef.current = next
+      setDebouncedSearch(next)
+      setPage(1)
+    }, 300)
+    return () => clearTimeout(timer)
+  }, [search])
 
-  const term = search.trim().toLowerCase()
-  const filtered = transactions.filter((t) => {
-    return (
-      t.merchantName.toLowerCase().includes(term) ||
-      t.id.toLowerCase().includes(term) ||
-      t.cardBrand.toLowerCase().includes(term) ||
-      t.status.toLowerCase().includes(term)
-    )
-  })
+  const { transactions, totalCount, totalProcessed, loading } = useTransactions(page, debouncedSearch)
 
   if (loading) {
     return (
@@ -47,9 +51,19 @@ export const TransactionsPage = () => {
         />
       </header>
 
-      <SummaryBar transactions={filtered} />
+      <SummaryBar count={totalCount} totalProcessed={totalProcessed} />
 
-      <TransactionList transactions={filtered} onSelect={setSelected} />
+      <TransactionList transactions={transactions} onSelect={setSelected} />
+
+      <div className="transaction-pagination">
+        <Pagination
+          current={page}
+          pageSize={PAGE_SIZE}
+          total={totalCount}
+          showSizeChanger={false}
+          onChange={setPage}
+        />
+      </div>
 
       <TransactionModal transaction={selected} onClose={() => setSelected(null)} />
     </>

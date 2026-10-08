@@ -1,6 +1,7 @@
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { Button, Input, Select } from "antd"
+import { mutate } from "swr"
 
 import { CardBrand } from "../models/transaction"
 import { createTransaction } from "../services/transaction-service"
@@ -17,6 +18,7 @@ export const NewTransactionPage = () => {
       cardBrand,
       amount: parseInt(amount),
     })
+    await mutate((key) => Array.isArray(key) && key[0] === "transactions")
     navigate("/")
   }
 

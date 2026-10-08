@@ -16,12 +16,47 @@ export interface NewTransactionInput {
   amount: number
 }
 
+export const PAGE_SIZE = 50
+
+export interface TransactionPageQuery {
+  page?: number
+  search?: string
+}
+
+export interface TransactionPage {
+  transactions: Transaction[]
+  totalCount: number
+  totalProcessed: number
+}
+
 export const createTransactionService = () => {
   const transactions = loadTransactions()
 
   const getAll = (): Transaction[] => transactions
 
   const getById = (id: string): Transaction | undefined => transactions.find((t) => t.id === id)
+
+  const getPage = ({ page, search }: TransactionPageQuery): TransactionPage => {
+    const pageNum = Number.isInteger(page) && page !== undefined && page >= 1 ? page : 1
+    const term = search?.trim().toLowerCase() ?? ""
+    const filtered = term
+      ? transactions.filter((t) => {
+          return (
+            t.merchantName.toLowerCase().includes(term) ||
+            t.id.toLowerCase().includes(term) ||
+            t.cardBrand.toLowerCase().includes(term) ||
+            t.status.toLowerCase().includes(term)
+          )
+        })
+      : transactions
+
+    const start = (pageNum - 1) * PAGE_SIZE
+    return {
+      transactions: filtered.slice(start, pageNum * PAGE_SIZE),
+      totalCount: filtered.length,
+      totalProcessed: _.round(_.sumBy(filtered, "total"), 2),
+    }
+  }
 
   const getSummary = (): TransactionSummary => ({
     count: transactions.length,
@@ -45,7 +80,7 @@ export const createTransactionService = () => {
     return transaction
   }
 
-  return { getAll, getById, getSummary, create }
+  return { getAll, getById, getPage, getSummary, create }
 }
 
 export type TransactionService = ReturnType<typeof createTransactionService>

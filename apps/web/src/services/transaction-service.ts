@@ -2,10 +2,25 @@ import type { CardBrand, Transaction } from "../models/transaction"
 
 const API_BASE = "/api"
 
-export const fetchTransactions = async (): Promise<Transaction[]> => {
-  const rsp = await fetch(`${API_BASE}/transactions`)
-  const data = await rsp.json()
-  return data.transactions
+export const PAGE_SIZE = 50
+
+export interface TransactionPage {
+  transactions: Transaction[]
+  totalCount: number
+  totalProcessed: number
+}
+
+export const fetchTransactions = async ({
+  page,
+  search,
+}: {
+  page: number
+  search: string
+}): Promise<TransactionPage> => {
+  const params = new URLSearchParams({ page: String(page) })
+  if (search) params.set("search", search)
+  const rsp = await fetch(`${API_BASE}/transactions?${params}`)
+  return rsp.json()
 }
 
 export interface NewTransactionInput {

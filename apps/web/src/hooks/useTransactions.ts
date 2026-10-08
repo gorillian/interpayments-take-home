@@ -1,18 +1,18 @@
-import { useEffect, useState } from "react"
+import useSWR from "swr"
 
-import type { Transaction } from "../models/transaction"
 import { fetchTransactions } from "../services/transaction-service"
 
-export const useTransactions = () => {
-  const [transactions, setTransactions] = useState<Transaction[]>([])
-  const [loading, setLoading] = useState(true)
+export const useTransactions = (page: number, search: string) => {
+  const { data, isLoading } = useSWR(
+    ["transactions", page, search],
+    () => fetchTransactions({ page, search }),
+    { keepPreviousData: true },
+  )
 
-  useEffect(() => {
-    fetchTransactions().then((data) => {
-      setTransactions(data)
-      setLoading(false)
-    })
-  }, [])
-
-  return { transactions, loading }
+  return {
+    transactions: data?.transactions ?? [],
+    totalCount: data?.totalCount ?? 0,
+    totalProcessed: data?.totalProcessed ?? 0,
+    loading: isLoading,
+  }
 }

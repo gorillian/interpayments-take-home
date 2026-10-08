@@ -18,8 +18,9 @@ app.get("/api/health", (_req: Request, res: Response) => {
 
 app.get("/api/transactions", (req: Request, res: Response) => {
   console.log("GET /api/transactions", req.query)
-  const transactions = transactionService.getAll()
-  res.json({ transactions })
+  const page = Number(req.query.page)
+  const search = typeof req.query.search === "string" ? req.query.search : ""
+  res.json(transactionService.getPage({ page, search }))
 })
 
 app.get("/api/transactions/summary", (_req: Request, res: Response) => {
