@@ -35,7 +35,7 @@ app.get("/api/transactions/summary", (_req: Request, res: Response) => {
 })
 
 app.post("/api/transactions", (req: Request, res: Response) => {
-  const { merchantName, cardBrand, amount } = req.body
+  const { merchantName, cardBrand, amount, surcharge } = req.body
 
   if (typeof merchantName !== "string" || merchantName.trim() === "") {
     return res.status(400).json({ error: "name missing" })
@@ -52,10 +52,20 @@ app.post("/api/transactions", (req: Request, res: Response) => {
     return res.status(400).json({ error: "amount invalid" })
   }
 
+  let roundedSurcharge: number | undefined
+  if (surcharge !== undefined && surcharge !== null && surcharge !== "") {
+    const parsedSurcharge = typeof surcharge === "number" ? surcharge : Number(surcharge)
+    if (!Number.isFinite(parsedSurcharge)) {
+      return res.status(400).json({ error: "surcharge invalid" })
+    }
+    roundedSurcharge = roundUpToCent(parsedSurcharge)
+  }
+
   const transaction = transactionService.create({
     merchantName: merchantName.trim(),
     cardBrand,
     amount: roundUpToCent(parsed),
+    ...(roundedSurcharge !== undefined ? { surcharge: roundedSurcharge } : {}),
   })
   res.status(201).json(transaction)
 })

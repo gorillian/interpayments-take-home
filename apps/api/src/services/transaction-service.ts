@@ -14,6 +14,7 @@ export interface NewTransactionInput {
   merchantName: string
   cardBrand: CardBrand
   amount: number
+  surcharge?: number
 }
 
 export const PAGE_SIZE = 50
@@ -65,14 +66,17 @@ export const createTransactionService = () => {
   })
 
   const create = (input: NewTransactionInput): Transaction => {
+    const surcharge = input.surcharge ?? 0
+    const surchargeRate =
+      input.amount > 0 && surcharge > 0 ? _.round(surcharge / input.amount, 4) : 0
     const transaction: Transaction = {
       id: `txn_${String(transactions.length + 1).padStart(6, "0")}`,
       merchantName: input.merchantName,
       cardBrand: input.cardBrand,
       amount: input.amount,
-      surchargeRate: 0,
-      surcharge: 0,
-      total: input.amount,
+      surchargeRate,
+      surcharge,
+      total: _.round(input.amount + surcharge, 2),
       status: TransactionStatus.APPROVED,
       createdAt: new Date().toISOString(),
     }

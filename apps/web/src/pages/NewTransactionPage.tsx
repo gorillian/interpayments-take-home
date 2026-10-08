@@ -23,6 +23,7 @@ export const NewTransactionPage = () => {
   const [merchantName, setMerchantName] = useState("")
   const [cardBrand, setCardBrand] = useState<CardBrand>(CardBrand.VISA)
   const [amount, setAmount] = useState<number | null>(null)
+  const [surcharge, setSurcharge] = useState<number | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
 
@@ -38,6 +39,7 @@ export const NewTransactionPage = () => {
         merchantName: merchantName.trim(),
         cardBrand,
         amount,
+        ...(surcharge !== null && Number.isFinite(surcharge) ? { surcharge } : {}),
       })
       await mutate((key) => Array.isArray(key) && key[0] === "transactions")
       message.success("Transaction created")
@@ -90,12 +92,27 @@ export const NewTransactionPage = () => {
         />
       </div>
 
+      <div className="form-field">
+        <InputNumber
+          style={{ width: "100%" }}
+          placeholder="Surcharge (optional)"
+          min={0}
+          step={0.01}
+          precision={2}
+          controls={false}
+          value={surcharge}
+          formatter={formatAmount}
+          parser={parseAmount}
+          onChange={(value) => setSurcharge(typeof value === "number" && Number.isFinite(value) ? value : null)}
+        />
+      </div>
+
       <Button type="primary" disabled={!canSubmit || submitting} onClick={handleSubmit}>
         Create
       </Button>
 
       {error && <p className="form-error">{error}</p>}
-      <p className="form-required">All fields are required.</p>
+      <p className="form-required">Surcharge is optional. All other fields are required.</p>
     </div>
   )
 }

@@ -27,6 +27,7 @@ export interface NewTransactionInput {
   merchantName: string
   cardBrand: CardBrand
   amount: number
+  surcharge?: number
 }
 
 export const createTransaction = async (input: NewTransactionInput): Promise<Transaction> => {
