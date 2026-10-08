@@ -57,6 +57,32 @@ body {
   margin-top: 0;
 }
 
+.transaction-detail {
+  max-width: 640px;
+  margin: 0 auto;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px 20px;
+}
+
+.transaction-detail h2 {
+  margin: 16px 0;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--muted);
+  font-size: 14px;
+  text-decoration: none;
+}
+
+.back-link:hover {
+  color: var(--ink);
+}
+
 .form-field {
   margin-bottom: 12px;
 }

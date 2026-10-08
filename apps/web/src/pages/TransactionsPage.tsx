@@ -1,19 +1,18 @@
 import { useEffect, useRef, useState } from "react"
+import { useNavigate } from "react-router-dom"
 import { Input, Pagination, Spin } from "antd"
 import { SearchOutlined } from "@ant-design/icons"
 
 import { SummaryBar } from "../components/SummaryBar"
 import { TransactionList } from "../components/TransactionList"
-import { TransactionModal } from "../components/TransactionModal"
 import { useTransactions } from "../hooks/useTransactions"
-import type { Transaction } from "../models/transaction"
 import { PAGE_SIZE } from "../services/transaction-service"
 
 export const TransactionsPage = () => {
+  const navigate = useNavigate()
   const [search, setSearch] = useState("")
   const [debouncedSearch, setDebouncedSearch] = useState("")
   const [page, setPage] = useState(1)
-  const [selected, setSelected] = useState<Transaction | null>(null)
   const debouncedRef = useRef(debouncedSearch)
 
   useEffect(() => {
@@ -53,7 +52,10 @@ export const TransactionsPage = () => {
 
       <SummaryBar count={totalCount} totalProcessed={totalProcessed} />
 
-      <TransactionList transactions={transactions} onSelect={setSelected} />
+      <TransactionList
+        transactions={transactions}
+        onSelect={(transaction) => navigate(`/transactions/${transaction.id}`)}
+      />
 
       <div className="transaction-pagination">
         <Pagination
@@ -64,8 +66,6 @@ export const TransactionsPage = () => {
           onChange={setPage}
         />
       </div>
-
-      <TransactionModal transaction={selected} onClose={() => setSelected(null)} />
     </>
   )
 }

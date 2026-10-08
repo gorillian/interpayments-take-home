@@ -10,6 +10,15 @@ export interface TransactionPage {
   totalProcessed: number
 }
 
+export const fetchTransaction = async (id: string): Promise<Transaction> => {
+  const rsp = await fetch(`${API_BASE}/transactions/${encodeURIComponent(id)}`)
+  const data = await rsp.json()
+  if (!rsp.ok) {
+    throw new Error(typeof data.error === "string" ? data.error : "Transaction not found")
+  }
+  return data
+}
+
 export const fetchTransactions = async ({
   page,
   search,
