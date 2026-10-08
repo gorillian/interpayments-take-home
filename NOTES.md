@@ -6,8 +6,7 @@ Issue 3: first thing I noticed was blank screen when submitting, both if the dat
 
 Issue 4: Should be simple, just pass the details and make the table clickable. Should handle going back to home page and display a good breakdown of the data we have on the transaction.
 
-Issue 5: Move the search and calculateTotal logic to backend, search is really slow and bad.
-Look into the pagination component to see if there are improvements there. adding a testing suite for creating new transactions minimum. clean up unused routes.
+Issue 5: Move calculateTotal logic to backend, adding a testing suite for creating new transactions minimum. clean up unused routes.
 
 First commit: update to use .total instead of amount, shows that I found the second issue
 
