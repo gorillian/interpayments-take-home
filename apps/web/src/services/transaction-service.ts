@@ -35,5 +35,9 @@ export const createTransaction = async (input: NewTransactionInput): Promise<Tra
     headers: { "content-type": "application/json" },
     body: JSON.stringify(input),
   })
-  return rsp.json()
+  const data = await rsp.json()
+  if (!rsp.ok) {
+    throw new Error(typeof data.error === "string" ? data.error : "Could not create transaction")
+  }
+  return data
 }
